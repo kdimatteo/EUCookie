@@ -22,15 +22,17 @@ var sessionCookies = 0;
 var totalCookies = 0;
 var thirdPartyCookies = 0;
 var persistantCookies = 0;
-var url, domain, dumpAll;
+var url, domain, dumpAll, returnJSON;
 
 if (system.args.length === 1) {
-    console.log('Pass some args when invoking. e.g.: $phantomjs app.js com.com true');
+    console.log('Pass some args when invoking. e.g.: $phantomjs app.js com.com true, false');
     phantom.exit();
 } else {
 	phantom.cookiesEnabled = true;
 
 	url = system.args[1];
+	dumpAll = (system.args[2] == "true") ? true : false;
+	returnJSON = system.args[3];
 
 	if (url.substr(0,4) != "http"){
 		domain = url
@@ -39,7 +41,10 @@ if (system.args.length === 1) {
 		domain = url.substr(7, url.length)
 	}
 
-	page.open(url, function () {
+
+	page.open(url, function() {
+		
+
 	    var d = new Date().getTime();
 
 	    for(var c in phantom.cookies){
@@ -52,18 +57,37 @@ if (system.args.length === 1) {
 	    	// check expiration date, if >29 days we consider this "persistent"
 	    	// could also use expiry here
 	    	var x = new Date(phantom.cookies[c].expires);
-	    	var delta = (x - delta) / (1000*60*60*24);
+	    	var delta = (x.getTime() - d) / (1000*60*60*24);
 			if(delta > 30) persistantCookies++;
-
 			// dump the cookie to STD.out if it was requested 
-			if(dumpAll) console.log(JSON.stringify(phantom.cookies[c]));
+			if(dumpAll) console.log(JSON.stringify(phantom.cookies[c], null, false));
 	    }
 
-	    // print results
-	    console.log("Total Cookies:\t\t\t" + totalCookies);
-	    console.log("3rd Party Cookies:\t\t" + thirdPartyCookies)
-	    console.log("Persistent Cookies: \t\t" + persistantCookies)
-
+	    if(returnJSON){ 
+	    	var o = {};	
+	    	try {
+		    	o["results"] = {
+		   			status 	: 1,
+		   			domain	: domain,
+		   			cookies 	: {
+			    		"third_party" 	: thirdPartyCookies,
+			    		"total"			: totalCookies,
+			    		"persistent" 	: persistantCookies
+			    	}
+			    }
+		    	console.log("###SUCCESS###" + JSON.stringify(o, null, false));
+		    } catch(e) {
+		    	o["results"] = {
+		    		"status"	: 0,
+		    		"domain"	: domain,
+		    		}
+		    }
+	    } else {
+	   		// log results
+	   		console.log("Total Cookies:\t\t\t" + totalCookies);
+	    	console.log("3rd Party Cookies:\t\t" + thirdPartyCookies)
+	    	console.log("Persistent Cookies: \t\t" + persistantCookies)
+	    }
 	    phantom.exit();
 	});
 

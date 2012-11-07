@@ -9,5 +9,8 @@ in a UA (with some exceptions).
 For more information:
 *  http://www.ico.gov.uk
 
+With thanks to:
+* https://opendata.socrata.com/dataset/Country-List-ISO-3166-Codes-Latitude-Longitude/mnkm-8ram
+
 
 
