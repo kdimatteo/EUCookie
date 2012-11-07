@@ -75,6 +75,9 @@ if (system.args.length === 1) {
 			    		"persistent" 	: persistantCookies
 			    	}
 			    }
+			    // this is a hack to be able to detect valid result lines in applications 
+			    // that comsume these results. There is no way to supress error in phantomJS
+			    // due to QtWebKit limitations...or imdoingitwrong
 		    	console.log("###SUCCESS###" + JSON.stringify(o, null, false));
 		    } catch(e) {
 		    	o["results"] = {
