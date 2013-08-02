@@ -1,4 +1,4 @@
-EuroBake
+EUCookie
 ========
 
 Quick and dirty script to check what kinds of cookies are being set for a given URL.
